@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const mysql = require('mysql');
+const path = require('path');
 
 const app = express();
 dotenv.config({ path: './.env' });
@@ -11,6 +12,8 @@ const db = mysql.createConnection({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE
 });
+
+const publicDir = path.join(__dirname, './public');
 
 db.connect((error) => {
     if (error) {
@@ -28,8 +31,12 @@ db.connect((error) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.set('view engine', 'hbs');
+app.use(express.static(publicDir));
+app.get('/', (req, res) => {
+    res.render('index');
 });
 
-// https://blog.logrocket.com/building-simple-login-form-node-js/
+app.listen(5000, () => {
+    console.log('Server started on port 5000');
+});
