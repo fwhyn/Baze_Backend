@@ -48,7 +48,7 @@ app.get("/login", (req, res) => {
     res.render("login")
 });
 
-app.post('/register', async (req, res) => {
+app.post('/auth/register', async (req, res) => {
     const { name, email, password, password_confirm } = req.body;
 
     db.query('SELECT email FROM users WHERE email = ?', [email], async (error, result) => {
