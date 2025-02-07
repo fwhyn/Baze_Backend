@@ -1,39 +1,39 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const mysql = require('mysql');
+const { Pool } = require('pg');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
 const app = express();
 dotenv.config({ path: './.env' });
 
-const db = mysql.createConnection({
+const pool = new Pool({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE
+    database: process.env.DATABASE,
+    port: process.env.DATABASE_PORT
 });
 
 const publicDir = path.join(__dirname, './public');
 
-db.connect((error) => {
+pool.connect((error) => {
     if (error) {
-        console.log('Error connecting to MySQL:', error);
+        console.log('Error connecting to PostgreSQL:', error);
     } else {
-        console.log('MySQL connected!');
+        console.log('PostgreSQL connected!');
         // Perform a simple query to check the connection
-        db.query('SELECT 1 + 1 AS solution', (err, results, fields) => {
+        pool.query('SELECT 1 + 1 AS solution', (err, results) => {
             if (err) {
                 console.log('Error executing query:', err);
             } else {
-                console.log('Query result:', results[0].solution); // Should print 2
+                console.log('Query result:', results.rows[0].solution); // Should print 2
             }
         });
     }
 });
 
 app.set('view engine', 'hbs');
-
 app.use(express.static(publicDir));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -41,22 +41,24 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.render('index');
 });
-app.get("/register", (req, res) => {
-    res.render("register")
+
+app.get('/register', (req, res) => {
+    res.render('register');
 });
-app.get("/login", (req, res) => {
-    res.render("login")
+
+app.get('/login', (req, res) => {
+    res.render('login');
 });
 
 app.post('/auth/register', async (req, res) => {
     const { name, email, password, password_confirm } = req.body;
 
-    db.query('SELECT email FROM users WHERE email = ?', [email], async (error, result) => {
+    pool.query('SELECT email FROM users WHERE email = $1', [email], async (error, result) => {
         if (error) {
             console.log(error);
         }
 
-        if (result.length > 0) {
+        if (result.rows.length > 0) {
             return res.render('register', {
                 message: 'This email is already in use'
             });
@@ -68,7 +70,7 @@ app.post('/auth/register', async (req, res) => {
 
         let hashedPassword = await bcrypt.hash(password, 8);
 
-        db.query('INSERT INTO users SET ?', { name: name, email: email, password: hashedPassword }, (err, result) => {
+        pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3)', [name, email, hashedPassword], (err, result) => {
             if (err) {
                 console.log(err);
             } else {
