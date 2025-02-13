@@ -8,11 +8,11 @@ const app = express();
 dotenv.config({ path: './.env' });
 
 const pool = new Pool({
-    host: process.env.DATABASE_HOST,
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE,
-    port: process.env.DATABASE_PORT
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    },
+    connectionTimeoutMillis: 30000 // 30 seconds
 });
 
 const publicDir = path.join(__dirname, './public');
