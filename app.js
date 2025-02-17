@@ -1,3 +1,8 @@
+// require('global-agent/bootstrap');
+
+// process.env.GLOBAL_AGENT_HTTP_PROXY = process.env.HTTP_PROXY;
+// process.env.GLOBAL_AGENT_HTTPS_PROXY = process.env.HTTPS_PROXY;
+
 const express = require('express');
 const dotenv = require('dotenv');
 const { Pool } = require('pg');
@@ -39,7 +44,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.render('index');
+    res.render('index', { user: req.user });
 });
 
 app.get('/register', (req, res) => {
@@ -78,6 +83,40 @@ app.post('/auth/register', async (req, res) => {
                     message: 'User registered!'
                 });
             }
+        });
+    });
+});
+
+app.post('/auth/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    pool.query('SELECT * FROM users WHERE email = $1', [email], async (error, result) => {
+        if (error) {
+            console.log(error);
+            return res.render('login', {
+                message: 'An error occurred. Please try again.'
+            });
+        }
+
+        if (result.rows.length === 0) {
+            return res.render('login', {
+                message: 'Email or password is incorrect.'
+            });
+        }
+
+        const user = result.rows[0];
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.render('login', {
+                message: 'Email or password is incorrect.'
+            });
+        }
+
+        // Successful login
+        res.render('index', {
+            message: 'Login successful!',
+            user: user
         });
     });
 });
