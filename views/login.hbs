@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>    
+<head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-  </head>
 </head>
 <body>
-
-{{!-- Navigation links --}}
+    {{!-- Navigation links --}}
     <nav>
-        <h4>Node MySQL Login</h4>
+        <h4>Node PostgreSQL Login</h4>
         <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/login">Login</a></li>
@@ -18,19 +16,18 @@
 
     {{!-- Body of each page will go here --}}
     <div class="container mt-4">
-        <div class="card" style="width: 18rem;">            
-            <div class="card-header">Login Form</div>    
+        <div class="card" style="width: 18rem;">
+            <div class="card-header">Login Form</div>
             <div class="card-body">
                 <form action="/auth/login" method="POST">
                     <div class="mb-3">
-                        <label for="name-log" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name-log" name="name">                        
+                        <label for="email-log" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email-log" name="email" required>
                     </div>
                     <div class="mb-3">
                         <label for="password-log" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password-log" name="password">
+                        <input type="password" class="form-control" id="password-log" name="password" required>
                     </div>
-
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
