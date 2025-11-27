@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AuthApplication",
+            "request": "launch",
+            "mainClass": "com.fwhyn.backend.auth.AuthApplication",
+            "projectName": "auth-auth-spring-boot"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-AuthApplication<auth-spring-boot>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
